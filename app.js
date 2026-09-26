@@ -3,10 +3,10 @@
 // Replace these two values with your own project's details.
 // Find them in Supabase: Project Settings → API
 // ─────────────────────────────────────────────────────────
-const SUPABASE_URL = "https://ayqvnrtzqdaigkfhrrtp.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://ayqvnrtzqdaigkfhrrtp.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_3pqGiQwkmaGvo2X0TFYf9A_vDtrC48z";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const TABLE = "movies";
 
 // ─────────────────────────────────────────────────────────
@@ -56,7 +56,7 @@ function initials(title) {
 // ─────────────────────────────────────────────────────────
 async function fetchMovies() {
   setStatus("Loading your list...");
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(TABLE)
     .select("*")
     .order("created_at", { ascending: false });
@@ -72,7 +72,7 @@ async function fetchMovies() {
 }
 
 async function addMovie(movie) {
-  const { data, error } = await supabase.from(TABLE).insert(movie).select();
+  const { data, error } = await supabaseClient.from(TABLE).insert(movie).select();
   if (error) {
     console.error(error);
     setStatus("Couldn't add that movie. Please try again.", true);
@@ -87,7 +87,7 @@ async function updateMovie(id, changes) {
   movies = movies.map((m) => (m.id === id ? { ...m, ...changes } : m));
   render();
 
-  const { error } = await supabase.from(TABLE).update(changes).eq("id", id);
+  const { error } = await supabaseClient.from(TABLE).update(changes).eq("id", id);
   if (error) {
     console.error(error);
     movies = previous;
@@ -101,7 +101,7 @@ async function deleteMovie(id) {
   movies = movies.filter((m) => m.id !== id);
   render();
 
-  const { error } = await supabase.from(TABLE).delete().eq("id", id);
+  const { error } = await supabaseClient.from(TABLE).delete().eq("id", id);
   if (error) {
     console.error(error);
     movies = previous;
