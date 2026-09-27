@@ -2,8 +2,8 @@
 
 A simple web app for tracking movies you want to watch and movies you've already seen. Sign up, add a movie, mark it watched, rate it out of 5 stars, search and filter your list — your list is private to your account.
 
-**Live app:** _add your Netlify link here_
-**Demo video:** _add your video link here_
+**Live app:** buildsoftwarepractice.netlify.app
+**Demo video:** https://youtu.be/8sn-AA2lF6g
 
 ## What it does
 
