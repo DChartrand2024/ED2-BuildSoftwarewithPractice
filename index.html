@@ -12,70 +12,105 @@
 </head>
 <body>
 
-  <header class="header">
-    <div class="header-inner">
-      <div class="brand">
-        <h1>Marquee</h1>
-        <p class="tagline">your watchlist, lit up</p>
+  <!-- ───────────── AUTH SCREEN (shown when logged out) ───────────── -->
+  <div id="authScreen" class="auth-wrap">
+    <div class="auth-card">
+      <h1 class="auth-brand">Marquee</h1>
+      <p class="tagline">your watchlist, lit up</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-mode="login">Log in</button>
+        <button class="auth-tab" data-mode="signup">Sign up</button>
       </div>
-      <button id="addToggle" class="btn btn-primary">+ Add a movie</button>
+
+      <form id="authForm">
+        <div class="field">
+          <label for="authEmail">Email</label>
+          <input type="email" id="authEmail" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label for="authPassword">Password</label>
+          <input type="password" id="authPassword" required minlength="6" autocomplete="current-password" />
+        </div>
+        <button type="submit" id="authSubmit" class="btn btn-primary auth-submit">Log in</button>
+      </form>
+
+      <p id="authMsg" class="status-msg"></p>
     </div>
-    <div class="bulbs" aria-hidden="true">
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span><span></span>
-    </div>
-  </header>
+  </div>
 
-  <main class="main">
+  <!-- ───────────── MAIN APP (shown when logged in) ───────────── -->
+  <div id="appScreen" class="hidden">
 
-    <form id="addForm" class="add-form hidden">
-      <div class="field">
-        <label for="title">Title</label>
-        <input type="text" id="title" required placeholder="e.g. Paddington 2" />
+    <header class="header">
+      <div class="header-inner">
+        <div class="brand">
+          <h1>Marquee</h1>
+          <p class="tagline" id="userTagline">your watchlist, lit up</p>
+        </div>
+        <div class="header-actions">
+          <button id="addToggle" class="btn btn-primary">+ Add a movie</button>
+          <button id="logoutBtn" class="btn btn-ghost">Log out</button>
+        </div>
       </div>
-      <div class="field field-small">
-        <label for="year">Year</label>
-        <input type="number" id="year" placeholder="2017" min="1888" max="2100" />
+      <div class="bulbs" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
       </div>
-      <div class="field field-small">
-        <label for="genre">Genre</label>
-        <input type="text" id="genre" placeholder="Comedy" />
+    </header>
+
+    <main class="main">
+
+      <form id="addForm" class="add-form hidden">
+        <div class="field">
+          <label for="title">Title</label>
+          <input type="text" id="title" required placeholder="e.g. Paddington 2" />
+        </div>
+        <div class="field field-small">
+          <label for="year">Year</label>
+          <input type="number" id="year" placeholder="2017" min="1888" max="2100" />
+        </div>
+        <div class="field field-small">
+          <label for="genre">Genre</label>
+          <input type="text" id="genre" placeholder="Comedy" />
+        </div>
+        <div class="field field-wide">
+          <label for="notes">Notes <span class="optional">(optional)</span></label>
+          <input type="text" id="notes" placeholder="Recommended by..." />
+        </div>
+        <div class="field field-actions">
+          <button type="submit" class="btn btn-primary">Add to list</button>
+          <button type="button" id="cancelAdd" class="btn btn-ghost">Cancel</button>
+        </div>
+      </form>
+
+      <div class="controls">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-filter="all">All</button>
+          <button class="tab" data-filter="to_watch">To watch</button>
+          <button class="tab" data-filter="watched">Watched</button>
+        </div>
+        <input type="search" id="search" class="search" placeholder="Search your list..." />
       </div>
-      <div class="field field-wide">
-        <label for="notes">Notes <span class="optional">(optional)</span></label>
-        <input type="text" id="notes" placeholder="Recommended by..." />
+
+      <p id="statusMsg" class="status-msg"></p>
+
+      <section id="grid" class="grid"></section>
+
+      <div id="emptyState" class="empty-state hidden">
+        <p class="empty-title">Nothing here yet</p>
+        <p class="empty-sub">Add a movie above to start your list.</p>
       </div>
-      <div class="field field-actions">
-        <button type="submit" class="btn btn-primary">Add to list</button>
-        <button type="button" id="cancelAdd" class="btn btn-ghost">Cancel</button>
-      </div>
-    </form>
 
-    <div class="controls">
-      <div class="tabs" role="tablist">
-        <button class="tab active" data-filter="all">All</button>
-        <button class="tab" data-filter="to_watch">To watch</button>
-        <button class="tab" data-filter="watched">Watched</button>
-      </div>
-      <input type="search" id="search" class="search" placeholder="Search your list..." />
-    </div>
+    </main>
 
-    <p id="statusMsg" class="status-msg"></p>
+    <footer class="footer">
+      <p>Built with Supabase · Your list is private to your account</p>
+    </footer>
 
-    <section id="grid" class="grid"></section>
-
-    <div id="emptyState" class="empty-state hidden">
-      <p class="empty-title">Nothing here yet</p>
-      <p class="empty-sub">Add a movie above to start your list.</p>
-    </div>
-
-  </main>
-
-  <footer class="footer">
-    <p>Built with Supabase · No login required</p>
-  </footer>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="app.js"></script>

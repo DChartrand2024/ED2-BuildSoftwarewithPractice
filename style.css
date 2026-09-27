@@ -327,3 +327,77 @@ h1, h2, h3 {
   .add-form { grid-template-columns: 1fr; }
   .header-inner { align-items: flex-start; }
 }
+
+/* ───────────── AUTH SCREEN ───────────── */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+}
+
+.auth-brand {
+  font-size: 40px;
+  color: var(--accent);
+}
+
+.auth-card .tagline {
+  margin-bottom: 20px;
+}
+
+.auth-tabs {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px;
+  margin-bottom: 20px;
+}
+
+.auth-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 8px 0;
+  border-radius: 999px;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-tab.active {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+#authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* ───────────── HEADER ACTIONS ───────────── */
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.hidden { display: none; }

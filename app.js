@@ -15,10 +15,21 @@ const TABLE = "movies";
 let movies = [];
 let currentFilter = "all";
 let searchTerm = "";
+let currentUser = null;
+let authMode = "login"; // "login" | "signup"
 
 // ─────────────────────────────────────────────────────────
 // 3. DOM REFS
 // ─────────────────────────────────────────────────────────
+const authScreen = document.getElementById("authScreen");
+const appScreen = document.getElementById("appScreen");
+const authForm = document.getElementById("authForm");
+const authTabs = document.querySelectorAll(".auth-tab");
+const authSubmit = document.getElementById("authSubmit");
+const authMsg = document.getElementById("authMsg");
+const userTagline = document.getElementById("userTagline");
+const logoutBtn = document.getElementById("logoutBtn");
+
 const grid = document.getElementById("grid");
 const emptyState = document.getElementById("emptyState");
 const statusMsg = document.getElementById("statusMsg");
@@ -36,6 +47,11 @@ function setStatus(msg, isError = false) {
   statusMsg.classList.toggle("error", isError);
 }
 
+function setAuthMsg(msg, isError = false) {
+  authMsg.textContent = msg;
+  authMsg.classList.toggle("error", isError);
+}
+
 // Deterministic "poster" color from the title, so each card looks distinct
 // without needing real poster images or an external API key.
 function posterStyle(title) {
@@ -51,8 +67,79 @@ function initials(title) {
   return title.trim().charAt(0).toUpperCase() || "?";
 }
 
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // ─────────────────────────────────────────────────────────
-// 5. DATA LAYER (Supabase)
+// 5. AUTH
+// ─────────────────────────────────────────────────────────
+authTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    authTabs.forEach((t) => t.classList.remove("active"));
+    tab.classList.add("active");
+    authMode = tab.dataset.mode;
+    authSubmit.textContent = authMode === "login" ? "Log in" : "Sign up";
+    setAuthMsg("");
+  });
+});
+
+authForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+
+  authSubmit.disabled = true;
+  setAuthMsg(authMode === "login" ? "Logging in..." : "Creating your account...");
+
+  const { data, error } =
+    authMode === "login"
+      ? await supabaseClient.auth.signInWithPassword({ email, password })
+      : await supabaseClient.auth.signUp({ email, password });
+
+  authSubmit.disabled = false;
+
+  if (error) {
+    setAuthMsg(error.message, true);
+    return;
+  }
+
+  if (authMode === "signup" && !data.session) {
+    setAuthMsg("Check your email to confirm your account, then log in.");
+    return;
+  }
+
+  setAuthMsg("");
+});
+
+logoutBtn.addEventListener("click", async () => {
+  await supabaseClient.auth.signOut();
+});
+
+// Reacts to login, logout, and signup events, and to the saved
+// session being restored automatically when the page loads.
+supabaseClient.auth.onAuthStateChange((_event, session) => {
+  currentUser = session?.user ?? null;
+
+  if (currentUser) {
+    authScreen.classList.add("hidden");
+    appScreen.classList.remove("hidden");
+    userTagline.textContent = currentUser.email;
+    fetchMovies();
+  } else {
+    appScreen.classList.add("hidden");
+    authScreen.classList.remove("hidden");
+    authForm.reset();
+    movies = [];
+  }
+});
+
+// ─────────────────────────────────────────────────────────
+// 6. DATA LAYER (Supabase)
+// Row Level Security ensures these queries only ever see
+// rows belonging to the logged-in user — no manual filtering needed.
 // ─────────────────────────────────────────────────────────
 async function fetchMovies() {
   setStatus("Loading your list...");
@@ -72,7 +159,11 @@ async function fetchMovies() {
 }
 
 async function addMovie(movie) {
-  const { data, error } = await supabaseClient.from(TABLE).insert(movie).select();
+  const { data, error } = await supabaseClient
+    .from(TABLE)
+    .insert({ ...movie, user_id: currentUser.id })
+    .select();
+
   if (error) {
     console.error(error);
     setStatus("Couldn't add that movie. Please try again.", true);
@@ -111,7 +202,7 @@ async function deleteMovie(id) {
 }
 
 // ─────────────────────────────────────────────────────────
-// 6. RENDERING
+// 7. RENDERING
 // ─────────────────────────────────────────────────────────
 function render() {
   const filtered = movies.filter((m) => {
@@ -157,14 +248,8 @@ function render() {
   });
 }
 
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
-
 // ─────────────────────────────────────────────────────────
-// 7. EVENT LISTENERS
+// 8. EVENT LISTENERS
 // ─────────────────────────────────────────────────────────
 addToggle.addEventListener("click", () => {
   addForm.classList.toggle("hidden");
@@ -233,8 +318,3 @@ grid.addEventListener("click", (e) => {
     }
   }
 });
-
-// ─────────────────────────────────────────────────────────
-// 8. INIT
-// ─────────────────────────────────────────────────────────
-fetchMovies();
